@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,500;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<title>Diagnóstico Nutricional Integral</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<script src="js/guias-llenado.js"></script>
+
+<script src="js/puente-nativo.js"></script>
+<div id="aviso-clinico" hidden style="position:fixed;inset:0;z-index:1000;background:rgba(20,25,35,.72);align-items:center;justify-content:center;padding:16px;overflow:auto">
+  <div style="max-width:440px;width:100%;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:16px;padding:20px 20px 16px;box-shadow:0 10px 40px rgba(0,0,0,.35)">
+    <div style="font-size:19px;font-weight:800;margin-bottom:8px">Aviso importante</div>
+    <p style="font-size:13.5px;line-height:1.55;color:var(--ink-2);margin:0 0 8px">NutriAndes es una <b>herramienta educativa y de apoyo</b> para personal de salud, estudiantes y promotores. <b>No sustituye</b> la valoración clínica presencial ni las normas vigentes del MSyD y AGEMED.</p>
+    <p style="font-size:13.5px;line-height:1.55;color:var(--ink-2);margin:0 0 8px">Las <b>dosis de fármacos</b> son orientativas, calculadas por peso o edad, y <b>deben ser confirmadas por un médico o farmacéutico</b> antes de prescribir o administrar. Los remedios naturales pueden tener efectos adversos e interacciones.</p>
+    <p style="font-size:12.5px;line-height:1.5;color:var(--muted);margin:0 0 14px">Los datos de pacientes se guardan solo en este teléfono. Haga respaldos periódicos desde Registro de pacientes.</p>
+    <button type="button" class="btn" onclick="avisoAceptar()" style="margin:0">Entiendo y acepto</button>
+  </div>
+</div>
+<div class="topbar">
+  <div class="brand">
+    <div class="logo-mark" title="Logo NutriAndes">
+      <svg viewBox="0 0 100 140" width="34" height="42">
+        <path d="M50 22 C22 22 16 58 21 88 C26 118 39 133 50 133 C61 133 74 118 79 88 C84 58 78 22 50 22 Z" fill="#E8791E" stroke="#c65f14" stroke-width="2"/>
+        <path d="M29 52 Q50 58 71 52" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M27 78 Q50 86 73 78" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M29 104 Q50 111 71 104" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="28" cy="16" rx="7" ry="17" fill="#5DA130" transform="rotate(-22 28 16)"/>
+        <ellipse cx="41" cy="7" rx="7" ry="19" fill="#6FBF3A" transform="rotate(-8 41 7)"/>
+        <ellipse cx="59" cy="7" rx="7" ry="19" fill="#6FBF3A" transform="rotate(8 59 7)"/>
+        <ellipse cx="72" cy="16" rx="7" ry="17" fill="#5DA130" transform="rotate(22 72 16)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">NutriAndes</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <button type="button" id="btn-modo" class="pill" onclick="toggleModoNoche()">🌙 Modo noche</button>
+  </div>
+</div>
+
+<div id="menu-inicio">
+  <div class="hero">
+    <div class="hero-eyebrow">Apoyo al diagnóstico · Bolivia</div>
+    <h1><span class="acc">Diagnóstico</span> Nutricional Integral</h1>
+    <p class="hero-sub"><b>Herramienta de apoyo para el personal de salud.</b> Evaluación, tratamiento y seguimiento nutricional, requerimiento nutricional diario, recordatorio de 24 horas. Todo en su teléfono, sin internet.</p>
+  </div>
+  <div class="menu-grid">
+    <button type="button" class="module-card mc-antro" onclick="abrirModulo('antropometria')">
+      <span class="mc-icon">📏</span>
+      <span>
+        <span class="mc-title">Evaluación Antropométrica</span>
+        <span class="mc-desc">IMC, Z-scores, diagnóstico y plan según AIEPI-Nut</span>
+      </span>
+      <span class="mc-arrow">→</span>
+    </button>
+    <button type="button" class="module-card mc-gesto" onclick="abrirModulo('gestograma')">
+      <span class="mc-icon">🤰</span>
+      <span>
+        <span class="mc-title">Gestograma</span>
+        <span class="mc-desc">Rueda gestacional y seguimiento del embarazo</span>
+      </span>
+      <span class="mc-arrow">→</span>
+    </button>
+    <button type="button" class="module-card mc-sus" onclick="abrirModulo('prestaciones')">
+      <span class="mc-icon">🏥</span>
+      <span>
+        <span class="mc-title">Prestaciones del Sistema Único de Salud (SUS)</span>
+        <span class="mc-desc">LINAME, códigos ATC, servicios SUS e interacciones</span>
+      </span>
+      <span class="mc-arrow">→</span>
+    </button>
+    <button type="button" class="module-card mc-herb" onclick="abrirModulo('remedios')">
+      <span class="mc-icon">🌿</span>
+      <span>
+        <span class="mc-title">Remedios herbales</span>
+        <span class="mc-desc">Plantas, altoandinos, infusiones y guía por dolencia</span>
+      </span>
+      <span class="mc-arrow">→</span>
+    </button>
+    <button type="button" class="module-card mc-r24" onclick="abrirModulo('r24h')">
+      <span class="mc-icon">🍽️</span>
+      <span>
+        <span class="mc-title">Recordatorio 24h</span>
+        <span class="mc-desc">Análisis químico, GEB/GET y adecuación de nutrientes</span>
+      </span>
+      <span class="mc-arrow">→</span>
+    </button>
+    <button type="button" class="module-card mc-reg" onclick="abrirModulo('registro')">
+      <span class="mc-icon">📋</span>
+      <span>
+        <span class="mc-title">Registro de pacientes</span>
+        <span class="mc-desc">Historial guardado en el teléfono (antropometría y 24 h)</span>
+      </span>
+      <span class="mc-arrow">→</span>
+    </button>
+  </div>
+  <button type="button" class="module-card mc-info acerca-card" onclick="abrirModulo('acerca')" style="margin-top:8px;padding:14px 18px;min-height:0">
+    <span class="mc-icon" style="width:40px;height:40px;font-size:20px">ℹ️</span>
+    <span>
+      <span class="mc-title" style="font-size:15px">Acerca de</span>
+      <span class="mc-desc" style="font-size:12.5px">Autores, referencias y descargo de responsabilidad</span>
+    </span>
+    <span class="mc-arrow" style="font-size:18px">→</span>
+  </button>
+</div>
+
+<div id="modulo-acerca" style="display:none">
+  <div class="modbar">
+    <button type="button" class="btn-back" onclick="volverMenu()">← Menú</button>
+    <div class="modbar-title">Acerca de</div>
+  </div>
+  <div class="ab-hero">
+    <div class="ab-logo">N</div>
+    <div>
+      <div class="ab-title">NutriAndes</div>
+      <div class="ab-sub">Apoyo al diagnóstico nutricional integral · Bolivia</div>
+    </div>
+  </div>
+  <div class="card ab-card">
+    <p class="ab-lead">Aplicación educativa de apoyo al <b>diagnóstico nutricional integral</b>, a la consulta de <b>Prestaciones del Sistema Único de Salud (SUS)</b>, insumos <b>LINAME 2022–2024</b> y <b>remedios naturales</b> de uso tradicional en Bolivia y la región andina.</p>
+    <div class="ab-facts">
+      <div><b>Funcionamiento local</b><span>Los datos de pacientes no se envían a un servidor.</span></div>
+      <div><b>Marco normativo</b><span>AIEPI-Nut · MSyD · AGEMED · OMS</span></div>
+      <div><b>Público objetivo</b><span>Personal de salud, estudiantes y promotores comunitarios.</span></div>
+    </div>
+
+    <div class="ab-sec">Equipo de desarrollo</div>
+    <div class="ab-team"><div class="ab-person"><div class="ab-avatar">RH</div><div><div class="ab-name">Roger V. Huarachi</div><div class="ab-role">Autor · Diseño y desarrollo</div></div></div><div class="ab-person"><div class="ab-avatar">NH</div><div><div class="ab-name">Nicol P. Huayta</div><div class="ab-role">Autor · Diseño y desarrollo</div></div></div></div>
+
+    <div class="ab-sec">Módulos incluidos</div>
+    <ul class="ab-list">
+      <li><b>Evaluación antropométrica:</b> Z-scores OMS, IMC, prematuros (Fenton), comorbilidad (Síndrome de Down), insumos LINAME según grupo etario y diagnóstico antropométrico, buscador de prestaciones SUS con selección múltiple para resultados.</li>
+      <li><b>Gestograma:</b> rueda gestacional y seguimiento del embarazo.</li>
+      <li><b>Prestaciones del SUS:</b> catálogo de servicios e insumos <b>LINAME 2022–2024</b> (código LINAME, clasificación A.T.Q./ATC, AWaRe-OMS, uso restringido, mecanismo de acción e interacción fármaco-nutriente).</li>
+      <li><b>Remedios naturales y herbales:</b> catálogo ampliado (~290 monografías) con plantas de Bolivia, Perú, Argentina, Chile, Paraguay y uso mundial; recetas, contraindicaciones, interacciones y nivel de riesgo (BAJO / MEDIO / ALTO); bloque de alerta para plantas y prácticas peligrosas.</li>
+      <li><b>Recordatorio de 24 horas:</b> análisis químico, GEB/GET (Mifflin-St Jeor / Schofield), peso ideal Hamwi con circunferencia de muñeca opcional, peso corregido automático en obesidad, ajuste del GET por objetivo (slider), requerimiento de agua automático por grupo etario.</li>
+      <li><b>Registro de pacientes:</b> historial local en el dispositivo.</li>
+    </ul>
+
+    <div class="ab-sec">Bibliografía y referencias</div>
+    <details class="ab-det"><summary>Ver 13 referencias</summary>
+    <ol class="ab-refs">
+      <li>Organización Mundial de la Salud (OMS). Patrones de crecimiento infantil y tablas de Z-scores (peso/edad, talla/edad, peso/talla, IMC/edad, perímetro cefálico). Criterio de talla baja: Z de talla/edad &lt; −2 DE.</li>
+      <li>Ministerio de Salud y Deportes del Estado Plurinacional de Bolivia (MSyD). Normas y lineamientos AIEPI-Nut / atención integrada nutricional comunitaria.</li>
+      <li>Manual de Aplicación de Prestaciones — Avanzando al Sistema Único de Salud. Serie Documentos Técnicos Normativos N° 388. MSyD, La Paz, 2015. R.M. N° 457/2015. Marco: Ley N° 475 de Prestaciones de Servicios de Salud Integral (catálogo de prestaciones de servicio del SUS).</li>
+      <li>Lista Nacional de Medicamentos Esenciales (LINAME) 2022–2024. Agencia Estatal de Medicamentos y Tecnologías en Salud (AGEMED) / MSyD. Clasificación A.T.Q. (ATC) y AWaRe-OMS. No incluye medicamentos excluidos del LINAME.</li>
+      <li>Fenton TR, Kim JH. A systematic review and meta-analysis to revise the Fenton growth chart for preterm infants. BMC Pediatr. 2013.</li>
+      <li>Requerimientos_nutricionales_macro_micro_por_edad_sexo.xlsx — compendio de requerimientos de macronutrientes (carbohidratos, fibra, proteína), agua total, vitaminas A, C, D, E y K, y minerales (calcio, hierro, magnesio, yodo y zinc) por grupo etario, sexo, embarazo y lactancia. Valores basados principalmente en las tablas NASEM (National Academies) Dietary Reference Intakes (DRI); el archivo cita además OMS/FAO <i>Vitamin and mineral requirements in human nutrition</i>, 2.ª ed. (2004), EFSA Dietary Reference Values, OMS (Healthy diet) y las Dietary Guidelines for Americans. Referencia para personas sanas (RDA/AI): embarazo, lactancia y enfermedad requieren evaluación individual, y los valores deben contrastarse con la normativa vigente del Ministerio de Salud y Deportes de Bolivia. Se aplica en el módulo Recordatorio de 24 horas.</li>
+      <li>Institute of Medicine. <i>Dietary Reference Intakes for Energy, Carbohydrate, Fiber, Fat, Fatty Acids, Cholesterol, Protein, and Amino Acids</i>. National Academies Press; 2005. Energía adicional en el módulo Recordatorio de 24 horas: embarazo +0 / +340 / +452 kcal/día (1.er, 2.º y 3.er trimestre) y lactancia +330 kcal/día (0–6 meses) o +400 kcal/día (7–12 meses), para mujer sana.</li>
+      <li>Mifflin MD et al. A new predictive equation for resting energy expenditure in healthy individuals. Am J Clin Nutr. 1990 (GEB adultos). Schofield WN. Predicting basal metabolic rate. Hum Nutr Clin Nutr. 1985 (GEB pediátrico).</li>
+      <li>Holliday MA, Segar WE. The maintenance need for water in parenteral fluid therapy. Pediatrics. 1957 (requerimiento hídrico). Orientaciones OMS de líquidos en adultos (ml/kg).</li>
+      <li>OPS/OMS · Ministerio de Salud y Deportes. Atención integrada al continuo del curso de la vida (AIEPI), 2021 — cuadro de evaluación nutricional del adolescente (clasificación y conducta).</li>
+      <li>Hamwi GJ. Therapy: changing dietary concepts. In: Diabetes Mellitus: Diagnosis and Treatment. 1964 (peso ideal y ajuste por contextura con circunferencia de muñeca). Peso corregido en obesidad: PI + 0,25 × (PA − PI).</li>
+      <li>Chumlea WC et al. Estimation of stature from knee height (talla estimada en adultos mayores).</li>
+      <li>Índice Resumen de Remedios Naturales (plantas de Bolivia, Perú, Argentina, Chile, Paraguay y remedios de uso mundial; bloques A–F e niveles de riesgo). Compilación etnobotánica y de seguridad con fines educativos.</li>
+      <li>Apelian N, Davis C. <i>El libro de los remedios herbales olvidados</i> (referencia de uso tradicional; no sustituye criterio clínico), complementado con saberes altoandinos de la región andina.</li>
+    </ol>
+    </details>
+
+    <div class="ab-sec">Descargo de responsabilidad</div>
+    <div class="alert-box ab-disc">
+      NutriAndes es una <b>herramienta educativa y de apoyo</b> orientada a personal de salud, estudiantes y promotores comunitarios. <b>No sustituye</b> la valoración clínica presencial, el criterio profesional ni las normas vigentes del MSyD, AGEMED u otras autoridades sanitarias.
+      Los autores <b>no se responsabilizan</b> por el uso inadecuado, la interpretación errónea de resultados, ni la prescripción o administración de medicamentos, suplementos, fórmulas o remedios naturales basada únicamente en esta aplicación.
+      Las plantas medicinales contienen principios activos potentes: pueden ser tóxicas, producir daño hepático o renal e interactuar con fármacos. Verifique siempre dosis, indicaciones, contraindicaciones e interacciones con fuentes oficiales y con el equipo de salud tratante. El uso de la aplicación implica la aceptación de esta limitación de responsabilidad.
+    </div>
+  </div>
+  <p class="autor-line" style="margin-top:8px">NutriAndes · Bolivia</p>
+</div>
+
+<div id="modulo-prestaciones" style="display:none">
+  <div class="modbar">
+    <button type="button" class="btn-back" onclick="volverMenu()">← Menú</button>
+    <div class="modbar-title">Prestaciones del Sistema Único de Salud (SUS)</div>
+  </div>
+  <div class="card">
+    <h2>Prestaciones del Sistema Único de Salud (SUS)</h2>
+    <p class="intro-note" style="margin-bottom:10px">Catálogo de <b>medicamentos LINAME 2022-2024</b> (AGEMED/MSyD) con código LINAME, clasificación <b>A.T.Q.</b>, uso restringido, <b>AWaRe-OMS</b>, mecanismo de acción e interacción fármaco-nutriente.</p>
+    <label>Buscar por nombre del fármaco, código LINAME o clasificación A.T.Q. (ATC)</label>
+    <input type="text" id="pl_buscador" placeholder="Ej. amoxicilina · J0106 · J01CA04 · hierro · Acceso · vitamina A..." oninput="buscarPrestacionLey475()" autocomplete="off">
+    <div class="warn-inline" id="pl_contador" style="margin-top:4px"></div>
+  </div>
+  <div id="pl_resultados"></div>
+</div>
+
+<div id="modulo-remedios" style="display:none">
+  <div class="modbar">
+    <button type="button" class="btn-back" onclick="volverMenu()">← Menú</button>
+    <div class="modbar-title">Remedios herbales</div>
+  </div>
+  <div class="card">
+    <h2>Remedios herbales naturales</h2>
+    <p style="font-size:11.5px;color:#5c6b82;margin-bottom:8px;line-height:1.4">
+      Resumen de referencia del libro <i>El libro de los remedios herbales olvidados</i> (Apelian &amp; Davis).
+      Uso tradicional (libro + saberes altoandinos de PE·BO·AR·CL) — <b>no sustituye consulta médica</b>. Verifique dosis y seguridad con un profesional.
+    </p>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+      <button type="button" class="btn" id="rm-tab-todos" onclick="rmCambiarTab('todos')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">🔍 Todos</button>
+      <button type="button" class="btn btn-clear" id="rm-tab-plantas" onclick="rmCambiarTab('plantas')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">Plantas y hongos</button>
+      <button type="button" class="btn btn-clear" id="rm-tab-guia" onclick="rmCambiarTab('guia')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">Guía por dolencia</button>
+      <button type="button" class="btn btn-clear" id="rm-tab-alto" onclick="rmCambiarTab('alto')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">🏔️ Altoandinos</button>
+      <button type="button" class="btn btn-clear" id="rm-tab-infusiones" onclick="rmCambiarTab('infusiones')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">🍵 Infusiones</button>
+      <button type="button" class="btn btn-clear" id="rm-tab-prep" onclick="rmCambiarTab('prep')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">Preparación</button>
+      <button type="button" class="btn btn-clear" id="rm-tab-caseros" onclick="rmCambiarTab('caseros')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">Remedios caseros</button>
+      <button type="button" class="btn btn-clear" id="rm-tab-adv" onclick="rmCambiarTab('adv')" style="width:auto;padding:6px 10px;font-size:12px;margin:0">Advertencias</button>
+    </div>
+    <label>Buscar por síntoma, signo, dolencia o nombre del remedio</label>
+    <input type="text" id="rm_buscador" placeholder="Ej. muña, gastritis, tos, ajo, mate de coca, estreñimiento..." oninput="rmBuscar()">
+    <div class="warn-inline" id="rm_contador" style="margin-top:4px"></div>
+  </div>
+  <div id="rm_resultados"></div>
+</div>
+
+<div id="modulo-r24h" style="display:none">
+  <div class="modbar">
+    <button type="button" class="btn-back" onclick="volverMenu()">← Menú</button>
+    <div class="modbar-title">Recordatorio 24h y Análisis Químico</div>
+  </div>
+
+  <div class="edit-banner" id="r24-edit-banner" style="display:none">
+    <span>✏️ Editando el recordatorio de <b id="r24-edit-name"></b> (registro #<span id="r24-edit-id"></span>). Agregue o quite alimentos y pulse «Actualizar registro».</span>
+    <button type="button" class="btn btn-clear" onclick="r24CancelarEdicion()">Cancelar edición</button>
+  </div>
+  <div class="fprog" id="r24prog">
+    <div class="fprog-top"><span id="r24prog-txt">Paso 1 · Datos 0/3 · Paso 2 · Alimentos 0</span><span id="r24prog-ok" style="display:none">✓ Análisis listo</span></div>
+    <div class="fprog-bar"><span id="r24prog-fill"></span></div>
+  </div>
+  <div class="card card-form sec-blue">
+    <h2><span class="sec-num">1</span> Datos y gasto energético (GEB / GET)</h2>
+    <div class="fgrid">
+      <div class="fsub span2">👤 Paciente</div>
+<div class="fld span2" style="--ico:'👤';--fc:#2f6fb3;--fs:rgba(47,111,179,.11)">
+    <label>Nombre del paciente <span class="opcional-tag">(para el registro local)</span></label>
+    <input type="text" id="r24_nombre" placeholder="Ej. María López">
+</div>
+      <div class="fld f-big" style="--ico:'⚖️';--fc:#d9731a;--fs:rgba(217,115,26,.11)"><label>Peso actual (kg)</label><input type="text" id="r24_peso" inputmode="decimal" placeholder="70" oninput="r24CalcGE()"></div>
+      <div class="fld f-big" style="--ico:'📏';--fc:#2e8b57;--fs:rgba(46,139,87,.11)"><label>Talla (cm)</label><input type="text" id="r24_talla" inputmode="decimal" placeholder="168" oninput="r24CalcGE()"></div>
+      <div class="fld" style="--ico:'🎂';--fc:#7a4fb5;--fs:rgba(122,79,181,.11)"><label>Edad (años)</label><input type="text" id="r24_edad" inputmode="numeric" placeholder="30" oninput="r24CalcGE()"></div>
+      <div class="fld" style="--ico:'🍼';--fc:#7a4fb5;--fs:rgba(122,79,181,.11)"><label>Meses <span class="opcional-tag">(pediatría · 0–11)</span></label><input type="text" id="r24_edad_meses" inputmode="numeric" placeholder="0" oninput="r24CalcGE()"></div>
+      <div class="fld" style="--ico:'⚥';--fc:#7a4fb5;--fs:rgba(122,79,181,.11)"><label>Sexo</label>
+        <select id="r24_sexo" onchange="r24CalcGE()">
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+        </select>
+      </div>
+      <div class="fld" style="--ico:'⌚';--fc:#8a6a1f;--fs:rgba(138,106,31,.11)">
+        <label>Circunferencia de muñeca (cm) <span class="opcional-tag">(opcional · Hamwi)</span></label>
+        <input type="text" id="r24_muneca" inputmode="decimal" placeholder="Ej. 15,5" oninput="r24CalcGE()">
+<div class="fnote">
+        Mejora la exactitud del peso ideal Hamwi según contextura (pequeña / mediana / grande). Medir en la muñeca no dominante, sobre la apófisis estiloides.
+      </div>
+</div>
+      <div class="fsub span2">⚡ Gasto energético y objetivo</div>
+      <div class="fld" style="--ico:'🏃';--fc:#14808c;--fs:rgba(20,128,140,.11)"><label>Nivel de actividad (NAF)</label>
+        <select id="r24_naf" onchange="r24CalcGE()">
+          <option value="1.2">En cama / reposo (1.2)</option>
+          <option value="1.4">Sedentario (1.4)</option>
+          <option value="1.6" selected>Trabajo ligero (1.6)</option>
+          <option value="1.8">Trabajo moderado (1.8)</option>
+          <option value="2.0">Trabajo pesado (2.0)</option>
+          <option value="2.2">Muy pesado / atleta (2.2)</option>
+        </select>
+      </div>
+      <div class="fld" style="--ico:'🩹';--fc:#b5483a;--fs:rgba(181,72,58,.11)"><label>Factor de injuria / estrés</label>
+        <select id="r24_injuria" onchange="r24CalcGE()">
+          <option value="1" selected>Ninguno (1.0)</option>
+          <option value="1.1">Cirugía menor / infección leve (1.1)</option>
+          <option value="1.2">Cirugía mayor / infección (1.2)</option>
+          <option value="1.3">Trauma / sepsis (1.3)</option>
+          <option value="1.4">Quemaduras extensas (1.4)</option>
+        </select>
+      </div>
+    <div class="span2 span2" id="r24_estado_fis" style="--ico:'🤰';--fc:#c2477f;--fs:rgba(194,71,127,.11);display:none;margin-top:12px;padding:10px 14px;border:1.5px dashed var(--line-2);border-radius:var(--r)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold)">Estado fisiológico <span class="opcional-tag">(requerimientos según el Excel DRI)</span></div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:4px">
+        <label class="chk-row" style="margin:0;border:none;padding:6px 0;cursor:pointer"><input type="checkbox" id="r24_embarazada" onchange="r24EstadoFisioCambio()"><span>Embarazada</span></label>
+        <label class="chk-row" style="margin:0;border:none;padding:6px 0;cursor:pointer"><input type="checkbox" id="r24_lactancia" onchange="r24EstadoFisioCambio()"><span>En lactancia</span></label>
+      </div>
+      <div style="display:block;margin-top:4px">
+        <div id="r24_fis_trim" style="display:none"><label style="margin-top:6px;font-size:12px">Trimestre del embarazo</label>
+          <select id="r24_trimestre" onchange="r24CalcGE()" style="min-height:42px;padding-top:8px;padding-bottom:8px;font-size:14px">
+            <option value="1">1.er trimestre (sem. 1–13)</option>
+            <option value="2" selected>2.º trimestre (sem. 14–27)</option>
+            <option value="3">3.er trimestre (sem. 28–42)</option>
+          </select>
+        </div>
+        <div id="r24_fis_lact" style="display:none"><label style="margin-top:6px;font-size:12px">Tiempo de lactancia</label>
+          <select id="r24_lact_per" onchange="r24CalcGE()" style="min-height:42px;padding-top:8px;padding-bottom:8px;font-size:14px">
+            <option value="1" selected>0–6 meses del bebé</option>
+            <option value="2">7–12 meses del bebé</option>
+          </select>
+        </div>
+      </div>
+      <div id="r24_fis_nota" style="font-size:11.5px;color:var(--muted);line-height:1.4;margin-top:2px"></div>
+    </div>
+      <div class="fld span2" style="--ico:'🎚️';--fc:#14808c;--fs:rgba(20,128,140,.11)">
+        <label>Ajuste del GET según objetivo</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <input type="range" id="r24_ajuste_get" min="-40" max="40" step="1" value="0"
+            oninput="r24SyncAjusteGetSlider()"
+            style="flex:1;min-width:0;height:8px;accent-color:var(--orange);cursor:pointer">
+          <span id="r24_ajuste_get_val" style="min-width:4.2em;text-align:right;font-weight:700;font-size:15px;color:var(--ink)">0%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px">
+          <span>−40% déficit</span>
+          <span>0 mant.</span>
+          <span>+40% superávit</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.35">
+          Deslice a la izquierda para déficit (bajar de peso) o a la derecha para superávit (subir de peso).
+        </div>
+      </div>
+      <div class="fsub span2">🥗 Distribución de macronutrientes</div>
+      <div class="fgrid fgrid4 span2">
+      <div class="fld" style="--ico:'🥩';--fc:#b5483a;--fs:rgba(181,72,58,.11)"><label>% Prot.</label><input type="text" id="r24_pct_prot" inputmode="decimal" value="15" oninput="r24SyncMacros('pct')" style="padding:6px 8px;font-size:13px"></div>
+      <div class="fld" style="--ico:'🥩';--fc:#b5483a;--fs:rgba(181,72,58,.11)"><label>Prot. g/kg</label><input type="text" id="r24_gkg_prot" inputmode="decimal" value="0.8" oninput="r24SyncMacros('gkg')" style="padding:6px 8px;font-size:13px"></div>
+      <div class="fld" style="--ico:'🍞';--fc:#c28a1f;--fs:rgba(194,138,31,.11)"><label>% CH</label><input type="text" id="r24_pct_ch" inputmode="decimal" value="55" oninput="r24SyncMacros('ch')" style="padding:6px 8px;font-size:13px"></div>
+      <div class="fld" style="--ico:'🥑';--fc:#2e8b57;--fs:rgba(46,139,87,.11)"><label>% Grasa</label><input type="text" id="r24_pct_fat" inputmode="decimal" value="30" oninput="r24SyncMacros('fat')" style="padding:6px 8px;font-size:13px"></div>
+      </div>
+    <div class="warn-inline span2" id="r24_macro_warn" style="margin-top:2px;font-size:11px"></div>
+    <div class="integral-box span2" id="r24_ge_box" style="margin-top:4px">Complete peso, talla, edad y sexo para calcular GEB, GET, macros y agua.</div>
+    </div>
+  </div>
+
+  <div class="card card-form sec-green">
+    <h2><span class="sec-num">2</span> Recordatorio de 24 horas — agregar alimentos</h2>
+    <div class="fgrid">
+<div class="fld span2" style="--ico:'🔍';--fc:#2e8b57;--fs:rgba(46,139,87,.11)">
+    <label>Buscar alimento (escriba al menos 2 letras)</label>
+    <input type="text" id="r24_buscador" placeholder="Ej. arroz, leche, pollo, amaranto..." oninput="r24BuscarAlimento()" autocomplete="off">
+</div>
+    <div class="span2" id="r24_sugerencias" style="max-height:180px;overflow-y:auto;margin-top:4px"></div>
+      <div class="fld" style="--ico:'🍽️';--fc:#2e8b57;--fs:rgba(46,139,87,.11)"><label>Alimento seleccionado</label><input type="text" id="r24_sel_nombre" readonly placeholder="Seleccione de la lista"></div>
+      <div class="fld" style="--ico:'⚖️';--fc:#d9731a;--fs:rgba(217,115,26,.11)"><label>Cantidad (g)</label><input type="text" id="r24_cant" inputmode="decimal" placeholder="100" value="100"></div>
+<div class="fld span2" style="--ico:'🕒';--fc:#14808c;--fs:rgba(20,128,140,.11)">
+    <label>Tiempo de comida</label>
+    <select id="r24_comida">
+      <option value="desayuno">Desayuno</option>
+      <option value="media_manana">Media mañana</option>
+      <option value="almuerzo">Almuerzo</option>
+      <option value="media_tarde">Media tarde</option>
+      <option value="cena">Cena</option>
+      <option value="colacion_nocturna">Colación nocturna</option>
+    </select>
+</div>
+      <div class="btnrow span2">
+    <button class="btn" onclick="r24Agregar()">＋ Agregar al recordatorio</button>
+    <button class="btn btn-clear" onclick="r24LimpiarLista()">Vaciar lista</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-form sec-purple">
+    <h2><span class="sec-num">3</span> Alimentos consumidos por tiempo de comida y comparación con el requerimiento</h2>
+    <div id="r24_resumen_comidas" style="margin-bottom:10px;font-size:12.5px;line-height:1.5"></div>
+    <div style="overflow-x:auto;border:1.5px solid var(--line);border-radius:var(--r)">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="text-align:left">Alimento</th>
+            <th>g</th>
+            <th>kcal</th>
+            <th>Prot</th>
+            <th>CH</th>
+            <th>Grasa</th>
+            <th>Fibra</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="r24_tabla_body"></tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td style="text-align:center" id="r24_t_g">0</td>
+            <td style="text-align:center" id="r24_t_kcal">0</td>
+            <td style="text-align:center" id="r24_t_prot">0</td>
+            <td style="text-align:center" id="r24_t_ch">0</td>
+            <td style="text-align:center" id="r24_t_fat">0</td>
+            <td style="text-align:center" id="r24_t_fib">0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div style="font-size:14px;font-weight:700;color:var(--gold);margin:18px 0 4px">Comparación consumo vs requerimiento</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4">Consumo de cada nutriente por tiempo de comida (solo los que tienen alimentos), total del día y su porcentaje de adecuación frente al requerimiento. Deslice la tabla hacia los lados para ver todas las columnas.</div>
+    <div style="overflow-x:auto;border:1.5px solid var(--line);border-radius:var(--r)">
+      <table class="data-table">
+        <thead><tr id="r24_comp_head"></tr></thead>
+        <tbody id="r24_comp_body"></tbody>
+      </table>
+    </div>
+    <p class="warn-inline" style="margin-top:8px">GEB: Mifflin-St Jeor (adultos) o Schofield (&lt;18 años). Si IMC≥30 se usa peso corregido. Macros orientativos: 15% Prot / 55% CH / 30% Grasa del GET. Micronutrientes referenciales para adultos. Los valores “—” indican que el alimento no tiene ese dato en la tabla de composición de origen (cobertura variable según nutriente).</p>
+  </div>
+
+  <div class="actionbar">
+    <button class="btn btn-download" id="r24-btn-guardar" onclick="r24GuardarIDB()">💾 Guardar en el teléfono</button>
+    <button class="btn btn-download" onclick="r24DescargarPDF()">📄 Descargar resumen 24h (PDF)</button>
+  </div>
+</div>
+
+<div id="modulo-registro" style="display:none">
+  <div class="modbar">
+    <button type="button" class="btn-back" onclick="volverMenu()">← Menú</button>
+    <div class="modbar-title">Registro de pacientes</div>
+  </div>
+  <div class="card">
+    <h2>Registro local</h2>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 10px">Tabla tipo hoja de cálculo · datos solo en este teléfono · no se envían a internet.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <button type="button" class="btn" id="reg-tab-pac" onclick="regCambiarTab('pacientes')" style="width:auto;padding:8px 14px;font-size:13px;margin:0">Evaluaciones</button>
+      <button type="button" class="btn btn-clear" id="reg-tab-r24" onclick="regCambiarTab('r24')" style="width:auto;padding:8px 14px;font-size:13px;margin:0">Recordatorios 24h</button>
+      <button type="button" class="btn btn-clear" id="reg-tab-hist" onclick="regCambiarTab('historial')" style="width:auto;padding:8px 14px;font-size:13px;margin:0">Historial / comparar</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px;border:1.5px dashed var(--line-2);border-radius:10px;background:var(--soft)">
+      <div style="flex:1 1 100%;font-size:12px;color:var(--muted);line-height:1.4"><b style="color:var(--ink)">Respaldo del registro.</b> Si borra los datos de la app o la desinstala, los registros se pierden. Exporte un respaldo y guárdelo en su correo, Drive o WhatsApp.</div>
+      <button type="button" class="btn" onclick="registroExportar()" style="width:auto;padding:8px 14px;font-size:13px;margin:0">⬇ Exportar respaldo</button>
+      <button type="button" class="btn btn-clear" onclick="document.getElementById('reg_import').click()" style="width:auto;padding:8px 14px;font-size:13px;margin:0">⬆ Importar respaldo</button>
+      <input type="file" id="reg_import" accept=".json,application/json" hidden onchange="registroImportar(this)">
+    </div>
+    <label>Buscar (nombre, establecimiento, diagnóstico…)</label>
+    <input type="text" id="reg_buscador" placeholder="Escriba para filtrar filas…" oninput="regRender()">
+    <div class="warn-inline" id="reg_contador" style="margin-top:4px"></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="reg-table-wrap" id="reg_lista"></div>
+  </div>
+  <div id="reg_detalle" style="display:none" class="card"></div>
+  <div id="reg_editor" style="display:none" class="card"></div>
+</div>
+
+<div id="modulo-gestograma" style="display:none">
+  <div class="modbar">
+    <button type="button" class="btn-back" onclick="volverMenu()">← Menú</button>
+    <div class="modbar-title">Gestograma</div>
+  </div>
+  <div class="fprog" id="gprog">
+    <div class="fprog-top"><span id="gprog-txt">FUM 0/1 · IMC gestacional (opcional) 0/2</span><span id="gprog-ok" style="display:none">✓ Gestograma listo</span></div>
+    <div class="fprog-bar"><span id="gprog-fill"></span></div>
+  </div>
+  <div class="card card-form sec-pink">
+    <h2><span class="sec-num">1</span> Datos del embarazo</h2>
+    <div class="fgrid">
+      <div class="fsub span2">📅 Fechas y semana</div>
+<div class="fld" style="--ico:'📅';--fc:#c2477f;--fs:rgba(194,71,127,.11)">
+    <label>Fecha de inicio del embarazo (FUM)</label>
+    <input type="date" id="g_fechaInicio" onchange="calcularGesto()">
+</div>
+<div class="fld" style="--ico:'🍼';--fc:#7a4fb5;--fs:rgba(122,79,181,.11)">
+    <label>Fecha probable de parto (calculada)</label>
+    <input type="date" id="g_fechaParto" readonly>
+</div>
+<div class="fld span2" style="--ico:'🗓️';--fc:#14808c;--fs:rgba(20,128,140,.11)">
+    <label>Semanas de gestación <span class="opcional-tag">(opcional — si no se indica, se usa la calculada por FUM)</span></label>
+    <input type="number" id="g_semanas_manual" min="4" max="42" step="1" inputmode="numeric" placeholder="Ej. 28" oninput="calcularGesto()">
+</div>
+      <div class="fsub span2">⚖️ IMC gestacional (opcional)</div>
+      <div class="fld f-big" style="--ico:'⚖️';--fc:#d9731a;--fs:rgba(217,115,26,.11)"><label>Peso actual (kg)</label><input type="text" id="g_peso" inputmode="decimal" placeholder="Ej. 62.5" oninput="calcularGesto()"></div>
+      <div class="fld f-big" style="--ico:'📏';--fc:#2e8b57;--fs:rgba(46,139,87,.11)"><label>Talla (cm)</label><input type="text" id="g_talla" inputmode="decimal" placeholder="Ej. 158" oninput="calcularGesto()"></div>
+      <div class="btnrow span2">
+    <button class="btn" onclick="calcularGesto()">Calcular</button>
+      </div>
+    <div class="integral-box span2" id="g_resultado" style="margin-top:2px">Ingrese la FUM; puede añadir peso y talla para el IMC gestacional.</div>
+    </div>
+  </div>
+  <div class="card gesto-card sec-pink">
+    <div class="gesto-wheel">
+      <svg viewBox="0 0 400 400" style="width:100%;height:100%;touch-action:none;filter:drop-shadow(0 4px 14px rgba(28,43,64,0.08))" id="g_svg">
+        <defs>
+          <linearGradient id="gOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c5e4f5"/>
+            <stop offset="100%" stop-color="#a8d4ec"/>
+          </linearGradient>
+          <linearGradient id="gMid" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fce4ec"/>
+            <stop offset="100%" stop-color="#f5c6d6"/>
+          </linearGradient>
+          <radialGradient id="gHub" cx="50%" cy="45%" r="55%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#f7f0f3"/>
+          </radialGradient>
+        </defs>
+        <circle cx="200" cy="200" r="196" fill="url(#gOuter)" stroke="#7eb6d4" stroke-width="2"/>
+        <circle cx="200" cy="200" r="151" fill="url(#gMid)" stroke="#e0a0b4" stroke-width="1.5"/>
+        <circle cx="200" cy="200" r="109" fill="#fff5f8" stroke="#ebc4d0" stroke-width="1.2"/>
+        <circle cx="200" cy="200" r="76" fill="url(#gHub)" stroke="#e8dde2" stroke-width="1.2"/>
+        <g id="g_wheelMarks"></g>
+      </svg>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:128px">
+        <div style="font-size:10px;font-weight:700;color:#8a7a88;letter-spacing:0.12em;text-transform:uppercase">Semana</div>
+        <div style="font-size:34px;font-weight:800;color:#d4548a;line-height:1;margin:4px 0;text-shadow:0 1px 0 rgba(255,255,255,0.6)" id="g_semanasValor">--</div>
+        <div style="font-size:11px;font-weight:600;color:#5c6b82;line-height:1.25" id="g_fechaCentro"></div>
+      </div>
+    </div>
+    <div class="gesto-legend">
+      <span><i style="background:#f5a3c0"></i> 1.er trimestre</span>
+      <span><i style="background:#8ec5e3"></i> 2.do trimestre</span>
+      <span><i style="background:#d48aaa"></i> 3.er trimestre</span>
+    </div>
+    <div class="gesto-slider-wrap">
+      <label style="margin-top:0;font-size:13px">Explorar semana (arrastre la rueda o el control)</label>
+      <input type="range" id="g_slider" min="1" max="42" value="1" oninput="seleccionarSemana(parseInt(this.value))" style="padding:0;border:none;background:transparent">
+      <div class="gesto-detalle" id="g_detalleSemana">Ingrese la FUM para explorar las semanas.</div>
+    </div>
+  </div>
+  <div class="card sec-purple">
+    <details class="manejo-box" id="gm-principal" style="margin-bottom:0">
+      <summary>🤰 Meses del embarazo: cambios en la madre y en el bebé</summary>
+      <div class="contenido">
+        <div style="font-size:13px;color:var(--muted)">Toque un mes para ver su desarrollo, los signos y síntomas frecuentes y las señales de alarma.</div>
+        <div id="gm-lista"></div>
+        <div class="gm-nota">Valores de referencia promedio: cada embarazo es distinto. Las semanas se agrupan en meses de forma práctica (el mes 3 y el mes 9 son los más largos). Esta información orienta, no reemplaza el control prenatal. En zonas de altura se vigila con mayor atención la presión arterial y el crecimiento fetal.</div>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div id="modulo-antropometria" style="display:none">
+  <div class="modbar">
+    <button type="button" class="btn-back" onclick="volverMenu()">← Menú</button>
+    <div class="modbar-title">Evaluación Antropométrica</div>
+  </div>
+<div id="form-section">
+  <div class="fprog" id="fprog">
+    <div class="fprog-top"><span id="fprog-txt">Datos obligatorios 0/5</span><span id="fprog-ok" style="display:none">✓ Listo para calcular</span></div>
+    <div class="fprog-bar"><span id="fprog-fill"></span></div>
+  </div>
+  <div class="card card-form sec-blue">
+    <h2><span class="sec-num">1</span> Datos del paciente</h2>
+    <div class="fgrid">
+      <div class="fld span2" style="--ico:'👤';--fc:#2f6fb3;--fs:rgba(47,111,179,.11)">
+    <label>Nombre completo</label>
+    <input type="text" id="nombre" placeholder="Ej. Juan Pérez">
+      </div>
+      <div class="fld" style="--ico:'📅';--fc:#2f6fb3;--fs:rgba(47,111,179,.11)">
+    <label>Fecha de evaluación <span class="opcional-tag">(por defecto: hoy — cambiar solo si es retroactiva)</span></label>
+    <input type="text" id="fecha_evaluacion" class="fecha-dmy" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" title="Formato: día/mes/año (ej. 09/10/2026)" oninput="onFechaDMYInput('fecha_evaluacion')" onblur="onFechaDMYBlur('fecha_evaluacion')">
+    <div id="fecha_evaluacion_hint" class="fecha-dmy-hint">Escriba solo números; se formatea solo como <b>dd/mm/aaaa</b> (ej. 09102026 → 09/10/2026).</div>
+      </div>
+      <div class="fld" style="--ico:'🩺';--fc:#2f6fb3;--fs:rgba(47,111,179,.11)">
+    <label>Comorbilidad presente <span class="opcional-tag req">(obligatorio)</span></label>
+    <select id="comorbilidad" onchange="toggleComorbilidad()">
+      <option value="ninguna">Ninguna</option>
+      <option value="sindrome_down">Síndrome de Down</option>
+      <option value="gastritis">Gastritis</option>
+    </select>
+      </div>
+      <div class="fld" style="--ico:'👪';--fc:#2f6fb3;--fs:rgba(47,111,179,.11)">
+    <label>Responsable / cuidador <span class="opcional-tag opt">(opcional)</span></label>
+    <input type="text" id="responsable" placeholder="Nombre de la madre/padre/tutor/familiar">
+      </div>
+      <div class="fld span2" style="--ico:'🏥';--fc:#2f6fb3;--fs:rgba(47,111,179,.11)">
+    <label>Comunidad / establecimiento de salud <span class="opcional-tag opt">(opcional)</span></label>
+    <input type="text" id="establecimiento" placeholder="Ej. Puesto de salud...">
+      </div>
+    <div class="fld span2" id="campo-cintura" style="--ico:'📏';--fc:#8a6a1f;--fs:rgba(138,106,31,.11);display:none">
+      <label>Perímetro de cintura (cm) <span class="opcional-tag">(a la altura del ombligo, fin de espiración)</span></label>
+      <input type="text" id="perimetro_cintura" inputmode="decimal" placeholder="0.0">
+    </div>
+    <details class="span2" id="campo-hitos-down" style="display:none;cursor:pointer">
+      <summary style="font-size:12.5px;font-weight:700;color:#8a6a1f;text-transform:uppercase;letter-spacing:.05em;list-style:none;cursor:pointer">▶ Evaluación del desarrollo — marcar hitos alcanzados</summary>
+      <div style="margin-top:8px" id="hitos-checklist"></div>
+    </details>
+    </div>
+  </div>
+  <div class="card card-form sec-orange">
+    <h2><span class="sec-num">2</span> Medidas antropométricas</h2>
+    <div class="fgrid">
+      <div class="fld" style="--ico:'⚥';--fc:#7a4fb5;--fs:rgba(122,79,181,.11)">
+    <label>Sexo <span class="opcional-tag req">(obligatorio)</span></label>
+    <select id="sexo" onchange="updatePesoIdeal()"><option value="">Seleccionar...</option><option value="M">Masculino</option><option value="F">Femenino</option></select>
+      </div>
+      <div class="fld" style="--ico:'🎂';--fc:#7a4fb5;--fs:rgba(122,79,181,.11)">
+<label>Fecha de nacimiento <span class="opcional-tag req">(obligatorio)</span></label>
+    <select id="tipo_fecha" onchange="toggleTipoFecha()" style="margin-bottom:6px">
+      <option value="exacta">Fecha exacta (día/mes/año)</option>
+      <option value="anio">Solo año de nacimiento (adultos)</option>
+    </select>
+    <div id="campo-fecha-exacta">
+      <input type="text" id="fecnac" class="fecha-dmy" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" title="Formato: día/mes/año (ej. 15/03/2018)" oninput="onFechaDMYInput('fecnac')" onblur="onFechaDMYBlur('fecnac')">
+      <div id="fecnac_hint" class="fecha-dmy-hint">Escriba solo números; se formatea solo como <b>dd/mm/aaaa</b> (ej. 15032018 → 15/03/2018).</div>
+    </div>
+    <div id="campo-fecha-anio" style="display:none">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="anio_nac" placeholder="Ej. 1985" oninput="calcEdadPorAnio()">
+    </div>
+    <div class="edad-calc" id="edad-display"></div>
+      </div>
+      <div class="fld span2" style="--ico:'🧒';--fc:#7a4fb5;--fs:rgba(122,79,181,.11)">
+    <label>Grupo etario <span class="opcional-tag">(automático según fecha de nacimiento; editable)</span></label>
+    <select id="grupo" onchange="toggleCamposGrupo()">
+      <option value="">Seleccionar...</option>
+      <option value="0-6m">Menor de 6 meses</option>
+      <option value="6-24m">6 meses a 23 meses 29 días</option>
+      <option value="2-5a">2 años a 5 años</option>
+      <option value="5-12a">5 años a 12 años</option>
+      <option value="12-17a">12 a 17 años (adolescente)</option>
+      <option value="adulto_joven">Adulto joven (18-59 años)</option>
+      <option value="am">Adulto mayor (60+ años)</option>
+      <option value="embarazada">Embarazada</option>
+    </select>
+    <div class="warn-inline" id="grupo-warn"></div>
+      </div>
+      <div class="fld f-big" style="--ico:'⚖️';--fc:#d9731a;--fs:rgba(217,115,26,.11)"><label>Peso (kg) <span class="opcional-tag req">(obligatorio)</span></label><input type="text" id="peso" inputmode="decimal" placeholder="0.00"></div>
+      <div class="fld f-big" style="--ico:'📏';--fc:#2e8b57;--fs:rgba(46,139,87,.11)"><label>Talla (cm) <span class="opcional-tag req">(obligatorio)</span></label><input type="text" id="talla" inputmode="decimal" placeholder="0.0" oninput="updateTallasEstimadas()"></div>
+    <div class="span2" id="campo-semanas" style="--ico:'🤰';--fc:#c2477f;--fs:rgba(194,71,127,.11);display:none">
+      <label>Estado</label>
+      <select id="estado_gestacion" onchange="toggleEstadoGestacion()">
+        <option value="embarazada">Embarazada</option>
+        <option value="lactancia">En periodo de lactancia (posparto)</option>
+      </select>
+      <div id="campo-semanas-input">
+        <label>Fecha probable de parto (FPP) <span class="opcional-tag">(opcional — calcula las semanas automáticamente)</span></label>
+        <input type="date" id="fpp" oninput="calcSemanasPorFPP()">
+        <label>Semanas de gestación</label>
+        <input type="number" id="semanas" min="4" max="42" step="1" inputmode="numeric" placeholder="Ej. 28">
+      </div>
+      <div id="campo-etapa-lactancia" style="display:none">
+        <label>Etapa de lactancia</label>
+        <select id="etapa_lactancia">
+          <option value="0-6m">0–6 meses posparto</option>
+          <option value=">6m">Más de 6 meses posparto</option>
+        </select>
+      </div>
+    </div>
+    <div class="fld" id="campo-pc" style="--ico:'🧠';--fc:#14808c;--fs:rgba(20,128,140,.11)">
+      <label>Perímetro cefálico (cm) — solo lactantes</label>
+      <input type="text" id="pc" inputmode="decimal" placeholder="0.0">
+    </div>
+      <div class="fld" style="--ico:'↩️';--fc:#d9731a;--fs:rgba(217,115,26,.11)"><label>Peso anterior (kg)</label><input type="text" id="peso_anterior" inputmode="decimal" placeholder="Opcional"></div>
+      <div class="fld" id="campo-muneca" style="--ico:'⌚';--fc:#8a6a1f;--fs:rgba(138,106,31,.11);display:none"><label>Circunferencia de muñeca (cm) <span class="opcional-tag">(para contextura)</span></label><input type="text" id="muneca" inputmode="decimal" placeholder="Ej. 16.5" oninput="updatePesoIdeal()"></div>
+      <div class="fld" style="--ico:'💧';--fc:#14808c;--fs:rgba(20,128,140,.11)">
+    <label>Edema (grado)</label>
+    <select id="edema_grado">
+      <option value="0">Ausente</option>
+      <option value="1">+1 (leve, tobillos)</option>
+      <option value="2">+2 (moderado, hasta rodillas)</option>
+      <option value="3">+3 (severo, generalizado/anasarca)</option>
+    </select>
+      </div>
+    <div class="span2" id="campo-pi" style="--ico:'🎯';--fc:#8a6a1f;--fs:rgba(138,106,31,.11);display:none">
+      <label id="pi-label">Peso ideal</label>
+      <input type="text" id="peso_ideal" readonly placeholder="Ingrese talla y muñeca">
+      <div id="pi-detalle" style="font-size:12px;color:var(--text-muted,#5c6b82);margin-top:4px;line-height:1.4"></div>
+    </div>
+    <div class="row2 span2" id="campo-alt-rodilla" style="--ico:'🦵';--fc:#2e8b57;--fs:rgba(46,139,87,.11);display:none">
+      <div><label>Altura de rodilla (cm)</label><input type="text" id="alt_rodilla" inputmode="decimal" placeholder="0.0" oninput="updateTallasEstimadas()"></div>
+      <div><label>Talla estimada (Chumlea)</label><input type="text" id="talla_chumlea" readonly></div>
+    </div>
+    <div class="row2 span2" id="campo-envergadura" style="--ico:'↔️';--fc:#2e8b57;--fs:rgba(46,139,87,.11);display:none">
+      <div><label>Media envergadura (cm)</label><input type="text" id="media_envergadura" inputmode="decimal" placeholder="0.0" oninput="updateTallasEstimadas()"></div>
+      <div><label>Talla estimada (envergadura)</label><input type="text" id="talla_envergadura" readonly></div>
+    </div>
+    <div class="span2" id="campo-adolescente" style="display:none;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--soft)">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:2px">Signos clínicos del adolescente · AIEPI 2021</div>
+      <label style="display:flex;align-items:center;gap:8px;font-style:normal;margin-top:8px;font-size:14px;font-weight:600"><input type="checkbox" id="ad_enflaq" style="flex:none"> Enflaquecimiento extremo</label>
+      <label style="display:flex;align-items:center;gap:8px;font-style:normal;margin-top:8px;font-size:14px;font-weight:600"><input type="checkbox" id="ad_palidez" style="flex:none"> Palidez palmar intensa</label>
+      <label style="display:flex;align-items:center;gap:8px;font-style:normal;margin-top:8px;font-size:14px;font-weight:600"><input type="checkbox" id="ad_distorsion" style="flex:none"> Distorsión de la imagen corporal</label>
+      <label style="display:flex;align-items:center;gap:8px;font-style:normal;margin-top:8px;font-size:14px;font-weight:600"><input type="checkbox" id="ad_hta" style="flex:none"> Presión arterial elevada (hipertensión arterial)</label>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.4">Marque lo que observe. En sobrepeso, tome la presión arterial y marque la última casilla si hay hipertensión.</div>
+    </div>
+    <div class="span2" id="campo-prematuro-check" style="--ico:'🍼';--fc:#c2477f;--fs:rgba(194,71,127,.11);display:none">
+      <label style="display:flex;align-items:center;gap:7px;font-style:normal;margin-top:0"><input type="checkbox" id="prematuro_check" onchange="togglePrematuro()" style="width:17px;height:17px"> Nació prematuro (usar edad corregida)</label>
+      <div id="campo-prematuro" style="display:none">
+        <label>Semanas de gestación al nacer</label>
+        <input type="text" inputmode="numeric" id="semanas_gest_nacer" placeholder="Ej. 32">
+      </div>
+    </div>
+    </div>
+  </div>
+  <details class="card sus-det" id="sus-det">
+    <summary>Prestaciones del Sistema Único de Salud (SUS) <span class="opcional-tag">(opcional)</span><span class="sus-badge" id="sus-badge" style="display:none">0</span></summary>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.4">Busque por enfermedad, signo clínico, código o denominación. Usa el catálogo oficial de prestaciones SUS (misma base que el módulo Prestaciones del SUS).</p>
+      <input type="text" id="antro_sus_buscador" placeholder="Ej. anemia, diarrea, tuberculosis, desnutrición, PC91, control prenatal..." oninput="buscarPrestacionAntroSUS()" autocomplete="off">
+      <div id="antro_sus_contador" style="font-size:12px;color:var(--muted);margin:6px 0 4px"></div>
+      <div id="antro_sus_resultados" style="max-height:320px;overflow-y:auto"></div>
+      <div id="antro_sus_seleccion_box" style="display:none;margin-top:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold)">Marcadas para esta evaluación (<span id="antro_sus_sel_n">0</span>)</div>
+        <div id="antro_sus_seleccion" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+      </div>
+  </details>
+  <div class="actionbar">
+  <button class="btn" onclick="calcular()">Calcular diagnóstico integral</button>
+  <button class="btn btn-clear" onclick="limpiar()">Nueva evaluación</button>
+  </div>
+</div>
+
+<div id="result">
+  <div class="card">
+    <h2>Paciente</h2>
+    <div style="font-size:15px;font-weight:700" id="r-nombre"></div>
+    <div style="font-size:13px;color:#5c6b82;margin-top:2px" id="r-info"></div>
+  </div>
+  <div id="r-alerta"></div>
+
+  <div class="card">
+    <h2>Esquema Integrado de Resultados</h2>
+    <div class="grid2" id="r-indicadores"></div>
+
+    <div class="esq-block">
+      <h3>Curvas de crecimiento OMS (percentil / desviación estándar)</h3>
+      <div id="r-curvas"></div>
+    </div>
+
+    <div class="esq-block">
+      <h3>Tabla resumen de indicadores OMS</h3>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11.5px">
+        <thead><tr style="background:var(--soft)"><th style="text-align:left;padding:5px;border:1px solid #ecdfc0">Indicador</th><th style="padding:5px;border:1px solid #ecdfc0">Aplica</th><th style="padding:5px;border:1px solid #ecdfc0">Z-Score</th><th style="padding:5px;border:1px solid #ecdfc0">Clasificación</th></tr></thead>
+        <tbody id="r-tabla-ind-body"></tbody>
+      </table></div>
+    </div>
+
+    <div class="esq-block" id="bloque-gastritis" style="display:none">
+      <h3>Manejo Nutricional — Gastritis</h3>
+      <div id="r-gastritis"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-edad-corregida" style="display:none">
+      <h3>Manejo Funcional — Edad Corregida y Peso (Prematuridad)</h3>
+      <div id="r-edad-corregida"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-down" style="display:none">
+      <h3>Manejo Nutricional — Síndrome de Down</h3>
+      <div id="r-down"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-manejo10" style="display:none">
+      <h3>Manejo protocolizado — Desnutrición Aguda (10 pasos)</h3>
+      <div id="r-manejo10"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-alim-complementaria" style="display:none">
+      <h3>Alimentación complementaria según edad</h3>
+      <div id="r-alim-complementaria"></div>
+    </div>
+
+    <div class="esq-block">
+      <h3>Diagnóstico integral clínico-nutricional</h3>
+      <div class="integral-box" id="r-integral"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-sintesis">
+      <h3>Prestaciones del SUS y tratamiento</h3>
+      <div id="r-sintesis"></div>
+    </div>
+
+    <div class="esq-block" style="display:none">
+      <h3>Prestaciones MSyD según edad</h3>
+      <div id="r-prestaciones"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-sus-seleccion" style="display:none">
+      <h3>Prestaciones e insumos marcados</h3>
+      <div id="r-sus-seleccion"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-ley475" style="display:none">
+      <h3>Respaldo normativo — Prestaciones del SUS</h3>
+      <div id="r-ley475"></div>
+    </div>
+
+    <div class="esq-block">
+      <h3>Porciones diarias recomendadas por grupo de alimentos</h3>
+      <div id="r-porciones"></div>
+    </div>
+
+    <div class="esq-block" id="bloque-catalogo-liname" style="display:none">
+      <h3>Insumos y suplementos con código LINAME 2022-2024</h3>
+      <p id="r-catalogo-motivo" style="font-size:12.5px;color:var(--muted);margin:0 0 8px;line-height:1.4"></p>
+      <div id="r-catalogo" style="overflow-x:auto"></div>
+    </div>
+
+    <div class="esq-block" style="display:none">
+      <h3>Esquema de suplementación / tratamiento</h3>
+      <div id="r-suplementacion"></div>
+    </div>
+
+    <div class="esq-block">
+      <h3>Requerimiento de agua (automático por grupo etario)</h3>
+      <div class="esq-item"><span class="esq-icon">💧</span><span id="r-agua"></span></div>
+    </div>
+
+    <div class="esq-block">
+      <h3>Próximo control sugerido</h3>
+      <div class="esq-item"><span class="esq-icon">📅</span><span id="r-control"></span></div>
+    </div>
+
+    <div class="esq-block">
+      <h3>Plan de manejo / conducta</h3>
+      <div style="font-size:13px;line-height:1.6" id="r-rec-text"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-download" onclick="guardarPacienteIDB()">💾 Guardar en el teléfono</button>
+  <button class="btn btn-download" onclick="descargarHistoriaPDF()">📄 Descargar historia clínica nutricional (PDF)</button>
+  <button class="btn btn-clear" onclick="volverForm()">← Nueva evaluación</button>
+  <div class="footer-credit">NutriAndes · Herramienta de apoyo al diagnóstico nutricional comunitario · Basada en AIEPI-Nut / MSyD Bolivia</div>
+</div>
+</div>
+
+<script src="js/datos/liname-catalogo.js"></script>
+<script src="js/datos/ley475.js"></script>
+<script src="js/datos/remedios.js"></script>
+<script src="js/datos/alimentos-24h.js"></script>
+<script src="js/referencias-oms.js"></script>
+<script src="js/prestaciones-msyd.js"></script>
+<script src="js/sintesis-prestaciones.js"></script>
+<script src="js/curvas-y-ui.js"></script>
+<script src="js/catalogo-liname.js"></script>
+<script src="js/navegacion.js"></script>
+<script src="js/gestograma.js"></script>
+<script src="js/remedios.js"></script>
+<script src="js/recordatorio-24h.js"></script>
+<script src="js/antropometria.js"></script>
+<script src="js/registro.js"></script>
+<script src="js/gestograma-meses.js"></script>
+<script src="js/nutripdf.js"></script>
+</body>
+</html>
